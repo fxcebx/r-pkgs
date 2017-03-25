@@ -1,7 +1,7 @@
 ---
 title: Package basics
 layout: default
-output: bookdown::html_chapter
+output: oldbookdown::html_chapter
 ---
 
 # Package metadata {#description}
@@ -14,7 +14,8 @@ Every package must have a `DESCRIPTION`. In fact, it's the defining feature of a
 Package: mypackage
 Title: What The Package Does (one line, title case required)
 Version: 0.1
-Authors@R: "First Last <first.last@example.com> [aut, cre]"
+Authors@R: person("First", "Last", email = "first.last@example.com",
+                  role = c("aut", "cre"))
 Description: What the package does (one paragraph)
 Depends: R (>= 3.1.0)
 License: What license is it under?
@@ -31,15 +32,7 @@ Description: The description of a package is usually long,
     should be indented, usually with four spaces.
 ```
 
-The minimal `DESCRIPTION` file only provides the bare necessities. It doesn't include the two most useful fields: `Imports` and `Suggests`. `Imports` tells R what packages you need to make the functions in your package work. `Suggests` tells R what packages you want to be available. The other fields are described in the remainder of the chapter, and include:
-
-* `Package`: what your package is called.
-
-* `Title` and `Description`: what your package does.
-
-* `License`: who's allowed to use and distribute it
-
-* `Authors@R`: who wrote it
+This chapter will show you how to use the most important `DESCRIPTION` fields.
 
 ## Dependencies: What does your package need? {#dependencies}
 
@@ -72,18 +65,18 @@ Both `Imports` and `Suggests` take a comma separated list of package names. I re
     it does _not_ mean that it will be attached along with your package (i.e., 
     `library(x)`). The best practice is to explicitly refer to external 
     functions using the syntax `package::function()`. This makes it very easy to 
-    identify which functions live outside your package. This is especially 
+    identify which functions live outside of your package. This is especially 
     useful when you read your code in the future.
   
-    If you use a lot functions from other packages this is rather
+    If you use a lot of functions from other packages this is rather
     verbose. There's also a minor performance penalty associated with `::` 
     (on the order of 5µs, so it will only matter if you call the function
-    millions of times). You'll learn about alternatives in 
-    [namespace imports](#imports).
+    millions of times). You'll learn about alternative ways to call functions
+    in other packages in [namespace imports](#imports).
 
-*   `Suggests`: your package can take advantage of packages listed here. Such 
-    advantages include specific datasets, the needs of one function in your 
-    package, or their use in tests or in building vignettes. 
+*   `Suggests`: your package can use these packages, but doesn't require them.
+    You might use suggested packages for example datasets, to run tests, 
+    build vignettes, or maybe there's only one function that needs the package.
   
     Packages listed in `Suggests` are not automatically installed along with
     your package. This means that you need to check if the package is available 
@@ -135,7 +128,7 @@ Suggests:
     MASS (>= 7.3.0)
 ```
 
-You almost always want to specify a minimum version rather than an exact version (`MASS (= 7.3.0)`). Since R can't have multiple versions of the same package loaded at the same time, specifying an exact dependency dramatically increases the chance of conflicting versions.
+You almost always want to specify a minimum version rather than an exact version (`MASS (== 7.3.0)`). Since R can't have multiple versions of the same package loaded at the same time, specifying an exact dependency dramatically increases the chance of conflicting versions.
 
 Versioning is most important when you release your package. Usually people don't have exactly the same versions of packages installed that you do. If someone has an older package that doesn't have a function your package needs, they'll get an unhelpful error message. However, if you supply the version number, they'll get a error message that tells them exactly what the problem is: an out of date package. 
 
@@ -143,14 +136,14 @@ Generally, it's always better to specify the version and to be conservative abou
 
 ### Other dependencies
 
-The are three other fields that allow you to express more specialised dependencies:
+There are three other fields that allow you to express more specialised dependencies:
 
   * `Depends`: Prior to the rollout of namespaces in R 2.14.0, `Depends` was 
     the only way to "depend" on another package. Now, despite the name, you 
     should almost always use `Imports`, not `Depends`. You'll learn why, and 
     when you should still use `Depends`, in [namespaces](#namespace).
     
-    You can use also use `Depends` to require a specific version of R, e.g.
+    You can also use `Depends` to require a specific version of R, e.g.
     `Depends: R (>= 3.0.1)`. As with packages, it's a good idea to 
     play it safe and require a version greater than or equal to the version 
     you're currently using. `devtools::create()` will do this for you.
@@ -163,11 +156,11 @@ The are three other fields that allow you to express more specialised dependenci
     You'll learn more about `LinkingTo` in [compiled code](#src).
     
   * `Enhances`: packages listed here are "enhanced" by your package. Typically, 
-    this means you provide methods for classes defined in another packags (a 
+    this means you provide methods for classes defined in another package (a 
     sort of reverse `Suggests`). But it's hard to define what that means, so I 
     don't recommend using `Enhances`.
     
-You can also list things that your package needs outside of R in the in `SystemRequirements` field. But this is just a plain text field and is not automatically checked. Think of it as a quick reference; you'll also need to include detailed system requirements (and how to install them) in your README.
+You can also list things that your package needs outside of R in the `SystemRequirements` field. But this is just a plain text field and is not automatically checked. Think of it as a quick reference; you'll also need to include detailed system requirements (and how to install them) in your README.
 
 ## Title and description: What does your package do? {#pkg-description}
 
@@ -199,7 +192,7 @@ Description: An implementation of the grammar of graphics in R. It combines
 A good title and description are important, especially if you plan to release your package to CRAN because they appear on the CRAN download page as follows:
 
 ```{r, echo = FALSE}
-bookdown::embed_png("diagrams/cran-package.png")
+oldbookdown::screenshot("diagrams/cran-package.png")
 ```
 
 Because `Description` only gives you a small amount of space to describe what your package does, I also recommend including a `README.md` file that goes into much more depth and shows a few examples. You'll learn about that in [README.md](#readme).
@@ -246,7 +239,7 @@ This command says that both the author (aut) and the maintainer (cre) is Hadley 
     lyricist ("lyr") or costume designer ("cst"), rest comfortably that you can 
     correctly describe their role in creating your package.)
 
-If you need to add additional clarification, you can also use the `comment` argument and supply the desired information in plain text.
+If you need to add further clarification, you can also use the `comment` argument and supply the desired information in plain text.
 
 You can list multiple authors with `c()`:
 
@@ -269,14 +262,14 @@ Authors@R: as.person(c(
 
 Every package must have at least one author (aut) and one maintainer (cre) (they might be the same person). The creator must have an email address. These fields are used to generate the basic citation for the package (e.g. `citation("pkgname")`). Only people listed as authors will be included in the auto-generated citation. There are a few extra details if you're including code that other people have written. Since this typically occurs when you're wrapping a C library, it's discussed in [compiled code](#src).
 
-As well as your email address, it's also a good idea to list other resources availble for help. You can list URLs in `URL` Multiple URLs are separated with a comma. `BugReports` is the URL where bug reports should be submitted. For example, knitr has:
+As well as your email address, it's also a good idea to list other resources availble for help. You can list URLs in `URL`. Multiple URLs are separated with a comma. `BugReports` is the URL where bug reports should be submitted. For example, knitr has:
 
 ```yaml
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 ```
 
-You can also use separate `Maintainer` and `Author` fields. I prefer not to use these fields because `Authors@R` offers much richer metadata. 
+You can also use separate `Maintainer` and `Author` fields. I prefer not to use these fields because `Authors@R` offers richer metadata. 
 
 ### On CRAN
 
@@ -284,7 +277,7 @@ The most important thing to note is that your email address (i.e., the address o
 
 ## License: Who can use your package? {#license}
 
-The `License` field can be either a standard abbreviation for an open source license, like `GPL-2` or `BSD`, or a pointer to a file containing more information `file LICENSE`. The license is really only important if you're planning on releasing your package. If you don't, you can ignore this section. If you want to make it clear that your package is not open source, use `License: file LICENSE` and then create a file called `LICENSE`, containing (e.g.):
+The `License` field can be either a standard abbreviation for an open source license, like `GPL-2` or `BSD`, or a pointer to a file containing more information, `file LICENSE`. The license is really only important if you're planning on releasing your package. If you don't, you can ignore this section. If you want to make it clear that your package is not open source, use `License: file LICENSE` and then create a file called `LICENSE`, containing for example:
 
     Proprietary 
 
@@ -308,7 +301,7 @@ Open source software licensing is a rich and complex field. Fortunately, in my o
 
   * [GPL-2](https://tldrlegal.com/license/gnu-general-public-license-v2) or 
     [GPL-3](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)). 
-    These are "copy-left" licenses. This means that any one who distributes your
+    These are "copy-left" licenses. This means that anyone who distributes your
     code in a bundle must license the whole bundle in a GPL-compatible way. 
     Additionally, anyone who distributes modified versions of your code 
     (derivative works) must also make the source code available. GPL-3 is a 
@@ -316,7 +309,7 @@ Open source software licensing is a rich and complex field. Fortunately, in my o
 
   * [CC0](https://tldrlegal.com/license/creative-commons-cc0-1.0-universal). 
     It relinquishes all your rights on the code and data so that it can be 
-    freely used by any one for any purpose. This is sometimes called putting it 
+    freely used by anyone for any purpose. This is sometimes called putting it 
     in the public domain, a term which is neither well-defined nor meaningful in 
     all countries.
   
@@ -385,12 +378,12 @@ We'll come back to version numbers in the context of releasing your package, [pi
 A number of other fields are described elsewhere in the book:
 
 * `Collate` controls the order in which R files are sourced. This only
-  matters if your functions have side-effects; most commonly because you're
+  matters if your code has side-effects; most commonly because you're
   using S4. This is described in more depth in [documenting S4](#man-s4).
 
 * `LazyData` makes it easier to access data in your package. Because it's so 
-  important, it's included in the minimal description. It's described in more
-  detail in [external data](#data).
+  important, it's included in the minimal description created by devtools. It's
+  described in more detail in [external data](#data).
 
 There are actually many other rarely, if ever, used fields. A complete list can be found in the "The DESCRIPTION file" section of the [R extensions manual][R-exts]. You can also create your own fields to add additional metadata. The only restrictions are that you shouldn't use existing names and that, if you plan to submit to CRAN, the names you use should be valid English words (so a spell-checking NOTE won't be generated).
 

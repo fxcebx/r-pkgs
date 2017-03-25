@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Compiled code
-output: bookdown::html_chapter
+output: oldbookdown::html_chapter
 ---
 
 # Compiled code {#src}
@@ -42,7 +42,7 @@ Once you're set up, the basic workflow should now be familiar:
 1.  Create a new C++ file:
 
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/new-cpp.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/new-cpp.png", dpi = 220)
     ```
 
     The default template looks like this:
@@ -64,18 +64,21 @@ Once you're set up, the basic workflow should now be familiar:
     ```
     
     It includes a basic function and some instructions to get started. The
-    two most important parts are the header includes, and the special
+    two most important parts are the header `#includes`, and the special
     attribute `// [[Rcpp::export]]`.
 
 1.  Generate the necessary modifications to your `NAMESPACE` by documenting
-    them with Cmd + Shift + D.
+    them with Ctrl/Cmd + Shift + D.
 
-1.  Press Cmd + Shift + L to load all code (or Cmd + Shift + B to
-    build and reload).
+1.  Click Build & Reload in the build pane, or press Ctrl/Cmd + Shift + B. You can
+    continue to use the standard `devtools::load_all()` process but it is more
+    risky. Because you're loading and unloading C code, the chances of 
+    corrupting memory are high, and you're better off with the safer, but
+    slower, "Build & Reload" which installs the package then restarts R.
 
 1.  Run `timesTwo(10)` from the console to check that it works.
 
-Behind the scenes, `devtools::load_all()` and RStudio's "Build and reload" are doing a lot of work for you. They:
+Behind the scenes, "Build and reload" is doing a lot of work for you. They:
 
 * Set up your R environment to compile code and warn you if you're missing 
   necessary pieces.
@@ -127,7 +130,7 @@ The distinctions between the two export directives is important:
 
 * `[[Rcpp::export]]` makes the C++ function available to R. If you have
   trouble remembering the exact details, note that everything comes in 
-  twos: Two `\`, two `[`, two `:` and two `]`.
+  twos: Two `/`, two `[`, two `:` and two `]`.
 
 * `@export` makes the R wrapper function available outside your package by
   adding it to the `NAMESPACE`.
@@ -147,8 +150,9 @@ This will generate a header file, `inst/include/mypackage.h` that can be include
 To use C++ code from another package:
 
 1. In `DESCRIPTION`, add `LinkingTo: otherPackage`. Confusingly this has nothing
-   to do with linking, but instead adds `otherPackage/include` to the include 
-   path.
+   to do with the linker. It's called `LinkingTo` because it adds 
+   `otherPackage/include` to the include path, allowing you to dynamically
+   "link to" other code via the headers.
 
 1. In the C++ file, add:
 
@@ -156,7 +160,7 @@ To use C++ code from another package:
     #include <otherPackage.h>
     ```
 
-1. Functions from otherPackage will be included in the `otherPackage` C++
+1. C++ functions from otherPackage will be included in the `otherPackage`
    namespace. Use `otherPackage::foo()` to access functions, or make 
    them available globally with `using namespace otherPackage`.
 
@@ -228,7 +232,7 @@ To call a C function from R, you first need a C function! In an R package, C cod
 
 These headers allow you to access R's C API. Unfortunately this API is not well documented. I'd recommend starting with my notes at [R's C interface](http://adv-r.had.co.nz/C-interface.html). After that, read "[The R API](http://cran.rstudio.com/doc/manuals/r-devel/R-exts.html#The-R-API)" in "Writing R Extensions". A number of exported functions are not documented, so you'll also need to read the [R source code](https://github.com/wch/r-source) to figure out the details.
 
-Here's the bare minimum you need to know: C functions that talk to R must use the `SEXP` type for both inputs and outputs. `SEXP`, short for S expression, is the C struct used to represent every type of object in R. A C function typically starts by converting `SEXP`s to C objects, and ends by converting C objects back to a `SEXP`. (The R API is designed so that these conversions often don't require copying.) The following table lists the functions that convert length one R vectors to and from C scalars:
+Here's the bare minimum you need to know: C functions that talk to R must use the `SEXP` type for both inputs and outputs. `SEXP`, short for S expression, is the C struct used to represent every type of object in R. A C function typically starts by converting `SEXP`s to atomic C objects, and ends by converting C objects back to a `SEXP`. (The R API is designed so that these conversions often don't require copying.) The following table lists the functions that convert length one R vectors to and from C scalars:
 
 R type      | C type      | R -> C            |  C -> R 
 ------------|-------------|-------------------|-------------------
@@ -269,7 +273,7 @@ useDynLib(mypackage, add_)
 This directive instructs R to create an object called `add_` which describes a C function pointer:
 
 ```{r, eval = FALSE}
-add_
+mypackage:::add_
 #> $name
 #> [1] "add_"
 #> 
@@ -282,13 +286,13 @@ add_
 #> [1] "NativeSymbolInfo"
 ```
 
-`.Call()` takes the pointer to a C function and calls it. It does not check the arguments, so you need to do that in the R function, in the C function, or just accept that R will crash every time you accidentally supply the wrong type of input.
+`.Call()` takes the pointer to a C function and calls it. All R objects have the same C type (the `SEXP`) you need to make sure the arguments are of the type you expect. Either do that in the R function, in the C function, or just accept that R will crash every time you accidentally supply the wrong type of input.
 
 The most complicated part of working with the `.Call()` interface is memory-management. Whenever you create an R-level data structure, you must `PROTECT()` it so the garbage collector doesn't try and free it, then `UNPROTECT()` it at the end of the function. This topic is beyond the scope of this chapter, but you can learn more about it at <http://adv-r.had.co.nz/C-interface.html#c-vectors>.
 
-### Getting starting with `.C()`
+### Getting started with `.C()`
 
-`.C()` is simpler than `.Call()` and can be useful if you already have standard C code. Since you never create R object in `.C()`, you never need to worry about memory management. To use it, you first write a void C function, using in-place modification of function parameters to return values:
+`.C()` is simpler than `.Call()` and can be useful if you already have standard C code. Since you never create R objects in `.C()`, you never need to worry about memory management. To use it, you first write a void C function, using in-place modification of function parameters to return values:
 
 ```c
 void add_(double* x, double* y, double* out) {
@@ -299,7 +303,7 @@ void add_(double* x, double* y, double* out) {
 Then like `.Call()` you create an R wrapper:
 
 ```{r, eval = FALSE}
-#' @mypackage src.c add_
+#' @useDynLib mypackage add_
 add <- function(x, y) {
   .C(add_, x, y, numeric(1))[[3]]
 }
@@ -326,16 +330,16 @@ You can learn more about `.C()` in its help, `?.C` and in [R-extensions](http://
 The usual workflow still applies:
 
 1.  Modify the C code.
-1.  Load all code with Cmd + Shift + L or Build and Reload with Cmd + Shift + B
+1.  Build and reload the package with Ctrl/Cmd + Shift + B
 1.  Experiment at the console.
 
-The first time you add `@useDynLib`, you'll also need to run `devtools::document()` (Cmd + Shift + D) and reload the package.
+The first time you add `@useDynLib`, you'll also need to run `devtools::document()` (Ctrl/Cmd + Shift + D) and reload the package.
 
 ### Exporting C code {#c-export}
 
 R packages need to provide DLLs that can be relocated; DLLs that work regardless of where they live on disk. This is because most R users don't build packages from source. Instead, they get binaries from CRAN that can get installed in many different places. This need for relocatable DLLs adds a few more steps to the job of importing and exporting C code for R packages (the same problem arises for C++, but Rcpp attributes automate the manual steps described below). 
 
-R solves this problem using __function registration__. To export a C function, you register it with `R_RegisterCCallable()`. To import a C function, you get a pointer to it with `R_GetCCallable()`. As we'll see below, a user-friendly package will do both these tasks, so users of the package can ignore the details and simply include a header a file.
+R solves this problem using __function registration__. To export a `.Call()` C function, you register it with `R_RegisterCCallable()`. To import a `.Call()` C function, you get a pointer to it with `R_GetCCallable()`. Similar techniques are available for `.C()` C functions, but are beyond the scope of this book. As we'll see below, a user-friendly package will do both these tasks, so users of the package can ignore the details and simply include a header a file.
 
 [Sidebar: Confusingly, there's another type of function registration. Instead of registering C functions using the namespace (i.e. `@useDynLib pkg fun`), you can register them with `R_registerRoutines()` and `@useDynLib mypackage, .registration = TRUE`. To learn the details read [Registering native extensions](http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines) in "Writing R extensions".]
 
@@ -381,8 +385,8 @@ Rather than relying on each package that imports your C code to do this correctl
 Using C code from another package varies based on how the package is implemented:
 
 * If it uses the system described above, all you need is `LinkingTo: otherPackage` 
-  in the `DESCRIPTION`, and `#include mypackageAPI.h` in the C file. (Remember 
-  `LinkingTo` is not about linking, but actually affects the include path).
+  in the `DESCRIPTION`, and `#include otherPackageAPI.h` in the C file. (Remember 
+  `LinkingTo` is not about the linker, but actually affects the include path).
    
 * If it registers the functions, but doesn't provide a header file, you'll
   need to write the wrapper yourself. Since you're not using any header
@@ -447,7 +451,7 @@ R --debugger=gdb
 
 This will start either [lldb](http://lldb.llvm.org) or [gdb](http://www.gnu.org/software/gdb/), the debuggers that work with code produced by `clang` or `gcc` respectively. Like R, `lldb` and `gdb` provide a REPL, a run-eval-print loop where you enter commands and then look at the results. In the examples below I'll show the results of `lldb`, which is what I use (the output from `gdb` is similar). For each interactive command I'll tell you the explicit, but long, `lldb` command and the short, but cryptic, `gdb` command. Because `lldb` understand all `gdb` commands, you can use choose to be explicit of terse.
 
-Once you've started the debugger, start R by typing `process start` or `run`. Now when your C/C++ code crashes you'll be dumped into an interactive debugger instead of getting a cryptic error message and a crash. 
+Once you've started the debugger, start R by typing `process start` (lldb) or `run` (gdb). Now when your C/C++ code crashes you'll be dumped into an interactive debugger instead of getting a cryptic error message and a crash. 
 
 Let's start with a simple C++ function that writes to memory it doesn't "own":
 
@@ -468,8 +472,8 @@ Use `devtools::load_all()` to load the current package. Then copy and paste the 
 
 ```
 Process 32743 stopped
-* thread #1: tid = 0x1f79f6, 0x0000000106a874e3 gggeom.so`vw_distance(x=0x00007fff5fbfcc50, y=0x00007fff5fbfcc40) + 499 at vw-distance.cpp:54, queue = 'com.apple.main-thread', stop reason = EXC_BAD_ACCESS (code=2, address=0x106a9cffc)
-    frame #0: 0x0000000106a874e3 gggeom.so`vw_distance(x=0x00007fff5fbfcc50, y=0x00007fff5fbfcc40) + 499 at vw-distance.cpp:54
+* thread #1: tid = 0x1f79f6, 0x... gggeom.so...`
+   frame #0: 0x0.. gggeom.so`vw_distance(x=..., y=...) + ... at vw-distance.cpp:54
    51        int prev_idx = prev[idx];
    52  	
    53  	    next[prev[idx]] = next_idx;
@@ -479,39 +483,44 @@ Process 32743 stopped
    57
 ```
 
-It tells us that the crash occurred because of a `EXC_BAD_ACCESS` - this is one of the most common types of crash in C/C++ code. Helpfully, lldb shows exactly which line of C++ code caused the problem: `vw-distance.cpp:54`. 
+It tells us that the crash occurred because of a `EXC_BAD_ACCESS` - this is one of the most common types of crash in C/C++ code. Helpfully, lldb shows exactly which line of C++ code caused the problem: `vw-distance.cpp:54`. Often just knowing where the problem occurs is enough to fix it. But we're also now at an interactive prompt. There are many commands you can run here to explore what's going on. The most useful are listed below:
 
-We're now at an interactive prompt can run the following commands:
+* See a list of all commands: `help`.
 
-* `help`: see a list of all commands. 
+* Show your location on the callstack with `thread backtrace`/`bt`. This
+  will print a list of calls leading up to the error, much like `traceback()`
+  does in R. Navigate the callstack with `frame select <n>`/`frame <n>`, or 
+  `up` and `down`.
 
-* `p cmd`: evaluate a C/C++ command in the current context
+* Evaluate the next expression with `thread step-over`/`next`, or step into it
+  with `thread step-in`/`step`. Continue executing the rest of the code with
+  `thread step-out`/`finish`
 
-* `bt`
+* Show all variables defined in the current frame with `frame variable`/
+  `info locals`, or print the value of a single variable with 
+  `frame variable <var>`/`p <var>`.
 
-* `thread continue`, `thread step-in`, `thread step-over`, `thread step-out`
-
-* `thread backtrace`
-
-* `frame select`, `up`, `down`
-
-* `frame variable`, `frame variable var`
-
-(int) idx = <no location, value may have been optimized out>
-
-Instead of waiting for a crash to occur you can also set breakpoints in your code.
-
-Setting breakpoints
+Instead of waiting for a crash to occur you can also set breakpoints in your code. To do so, start the debugger, run R, then:
 
 1. Press `Ctrl + C`
 
-1. Type `breakpoint set --file foo.c --line 12 `
+1. Type `breakpoint set --file foo.c --line 12`/`break foo.c:12`.
 
-1. `c` to continue running.
+1. `process continue`/`c` to go back to the R console. Now run the C code
+   you're interested in, and the debugger will stop when it gets to the 
+   specified line.
 
-This is also useful if your code is stuck in an infinite loop. Press `Ctrl + C` to break into the debugger and see which line of code is causing the problem.
+You can also set a breakpoint for any C++ exception: this allows you to figure out exactly where a C++ error occurs:
 
+1. Press `Ctrl + C`
 
+1. Type `breakpoint set -E c++`.
+
+1. `process continue`/`c` to go back to the R console. Now if an exception
+   is thrown in C++ code (or by R's C API when wrapped in Rcpp code), the 
+   debugger will stop.
+
+Finally, you can also use the debugger if your code is stuck in an infinite loop. Press `Ctrl + C` to break into the debugger and you'll see which line of code is causing the problem.
 
 ## Makefiles {#make}
 
@@ -589,14 +598,14 @@ Packages with compiled code are much more likely to have difficulties getting on
 
 The interface between CRAN's automated and manual checking can be particularly frustrating for compiled code. Requirements vary from submission to submission, based on which maintainer you get and how much free time they have. The rules are inconsistently applied, but if your package doesn't pass, it's better to bite the bullet and make the change rather than trying to argue about it:
 
-* Sometimes you will need to list all authors and copyright holders of included 
-  code in the DESCRIPTION. 
-
-* Sometimes your package will need to work on Solaris. But due to the difficulty 
-  of accessing a computer running Solaris, fixing Solaris issues can be hard. 
-  However, you will be in a stronger negotiating position if the package has no 
-  problems on other platforms. 
+  * Sometimes you will need to list all authors and copyright holders of included 
+    code in the DESCRIPTION. 
   
-  One common gotcha: gcc/clang flags `-Wall`, `-pedantic` and `-O0` do not work 
-  with the default compiler on Solaris.
+  * Sometimes your package will need to work on Solaris. But due to the difficulty 
+    of accessing a computer running Solaris, fixing Solaris issues can be hard. 
+    However, you will be in a stronger negotiating position if the package has no 
+    problems on other platforms. 
+  
+    One common gotcha: gcc/clang flags `-Wall`, `-pedantic` and `-O0` do not work 
+    with the default compiler on Solaris.
 

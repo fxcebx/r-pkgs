@@ -1,21 +1,16 @@
 ---
 title: Git and GitHub
 layout: default
-output: bookdown::html_chapter
+output: oldbookdown::html_chapter
 ---
 
 # Git and GitHub {#git}
 
-If you're serious about software development, you really need to learn about Git. Git is a _version control system_, a tool that tracks changes to your code and shares those changes with others. Git is most useful when combined with [GitHub](http://github.com), a website that allows you to share your code with the world, solicit improvements via pull requests and track issues. 
+If you're serious about software development, you need to learn about Git. Git is a _version control system_, a tool that tracks changes to your code and shares those changes with others. Git is most useful when combined with [GitHub](http://github.com), a website that allows you to share your code with the world, solicit improvements via pull requests and track issues. Git + GitHub is the most popular version control system for developers of R packages (witness the thousands of R packages hosted on GitHub).
 
-This is why it's no surprise that Git + GitHub is the most popular version control system for developers of R packages (witness the thousands of R packages hosted on GitHub), and why this chapter makes no effort to distinguish between features that belong to Git and those that belong to GitHub. 
+Git and GitHub are generally useful for all software development and data analysis, not just R packages. I've included it here, because it is so useful when you're making a package. There's no way I could be as productive without Git and GitHub at my back, enabling me to rapidly spot mistakes and easily collaborate with others. 
 
 Why use Git + GitHub?
-
-  * Do you have a directory full of files like `my-script.R`, `my-script-1.R`,
-    `myscript-2-I-really-hope-this-works.R`, `myscript-FINALLY.R` and so on?
-    Git takes care of managing multiple versions of your code so you can easily
-    see what's changed and undo mistakes if needed.
 
   * It makes sharing your package easy. Any R user can install your package with 
     just two lines of code:
@@ -37,17 +32,22 @@ Why use Git + GitHub?
     same file at the same time. Git will either combine your changes 
     automatically, or it will show you all the ambiguities and conflicts.
 
-You can do many of these same things with other tools (like [subversion](https://subversion.apache.org) or [mercurial](http://mercurial.selenic.com)) and other websites (like [gitlab](https://about.gitlab.com) and [bitbucket](https://bitbucket.org)). But I think Git + GitHub is the most user-friendly system (especially for new developers), not least because its popularity means that the answer or solution to every possible question or problem can be found on StackOverflow. 
+  * Have you ever accidentally pressed `s` instead of Cmd + S to save your
+    file? It's very easy to accidentally introduce a mistake that takes a few
+    minutes to track down. Git makes this problem easy to spot because it 
+    allows you to see exactly what's changed and undo any mistakes.
 
-There is a lot to learn about Git. (If you look at tutorials online you'll find a tremendous amount of information but little guidance about what to do with it or why you need to care). But don't give up! Using Git will be frustrating at first. Persevere and you'll unlock the super-power of code collaboration.
+You can do many of these same things with other tools (like [subversion](https://subversion.apache.org) or [mercurial](http://mercurial.selenic.com)) and other websites (like [gitlab](https://about.gitlab.com) and [bitbucket](https://bitbucket.org)). Git is most useful in conjunction with GitHub, and vice versa, so I'll make no effort to distinguish between features that belong to Git and those that belong to GitHub. But I think Git + GitHub is the most user-friendly system (especially for new developers), not least because its popularity means that the answer or solution to every possible question or problem can be found on StackOverflow. 
+
+This is not to say that Git is easy to learn. Your initial experiences with Git are likely to be frustrating and you will frequently curse at the strange terminology and unhelpful error messages. Fortunately, there are many tutorials available online, and while they aren't always well written (many provide a lot of information but little guidance about what to do with it or why you need to care), you can absolutely master Git with a little practice. Don't give up! Persevere and you'll unlock the super-power of code collaboration.  
 
 ## RStudio, Git and GitHub {#git-rstudio}
 
-RStudio makes day-to-day use of Git easy. Once you've set up a project to use Git, you'll see a new pane and toolbar icon. These provide shortcuts to the most commonly used Git commands. However, because only a handful of the 150+ Git commands are available in RStudio, you also need to be familiar with using Git from the command line (aka the shell or console). This is especially true when you're setting up, dealing with merge conflicts, or getting out of jams. This is also important because if you get stuck you'll need to conduct your search for a solution with the names of standard Git commands.
+RStudio makes day-to-day use of Git simpler. Once you've set up a project to use Git, you'll see a new pane and toolbar icon. These provide shortcuts to the most commonly used Git commands. However, because only a handful of the 150+ Git commands are available in RStudio, you also need to be familiar with using Git from the __shell__ (aka the command line or the console). It's also useful to be familiar with using Git in a shell because if you get stuck you'll need to search for a solution with the Git command names.
 
 The easiest way to get to a shell from RStudio is Tools > Shell. This will open a new shell located in the root directory of your project. (NB: on Windows, this opens up a _bash_ shell, the standard Linux shell, which behaves a little differently from the usual `cmd.exe` shell.)
 
-If you've never used the shell before, don't worry, it's very similar to using R. The main difference is that instead of functions, you call commands, which have a slightly different syntax. For example, in R you might write `f(x, y = 1)`, where in the shell you'd write `f x --y=1` or `f x -y1`. Also, while shell commands are even less regular than R functions, you fortunately only need to be familiar with a few. In this chapter, you won't be doing much in the shell apart from running the Git commands that I give you. However, it's a good idea to learn the three most important shell commands:
+Don't worry if you've never used the shell before because it's very similar to using R. The main difference is that instead of functions, you call commands, which have a slightly different syntax. For example, in R you might write `f(x, y = 1)`, where in the shell you'd write `f x --y=1` or `f x -y1`. Also, while shell commands are even less regular than R functions, you fortunately only need to be familiar with a few. In this chapter, you won't be doing much in the shell apart from running Git commands. However, it's a good idea to learn the three most important shell commands:
 
 * `pwd`: print working directory. This tells you which directory you're currently in.
 * `cd <name>`: change directory. Use `cd ..` to move up the directory hierarchy.
@@ -64,24 +64,24 @@ If you've never used Git or GitHub before, start by installing Git and creating 
     * Windows: <http://git-scm.com/download/win>.
     * OS X: <http://git-scm.com/download/mac>.
     * Debian/Ubuntu: `sudo apt-get install git-core`.
-    * Other linux distros: <http://git-scm.com/download/linux>.
+    * Other Linux distros: <http://git-scm.com/download/linux>.
 
 1.  Tell Git your name and email address. These are used to label each commit
     so that when you start collaborating with others, it's clear who made 
     each change. In the shell, run:
 
     ```bash
-    git config --global user.name "<YOUR NAME>"
-    git config --global user.email "<YOUR EMAIL ADDRESS>"
+    git config --global user.name "YOUR FULL NAME"
+    git config --global user.email "YOUR EMAIL ADDRESS"
     ```
 
     (You can check if you're set up correctly by running 
     `git config --global --list`.)
 
 1.  Create an account on GitHub, <https://github.com> (the free plan is fine). 
-    Use the same name and email address as above.
+    Use the same email address as above.
     
-1.  If needed, generate a SSH key-pair. SSH keys allow you to securely 
+1.  If needed, generate a SSH key. SSH keys allow you to securely 
     communicate with websites without a password. There are two parts to 
     an SSH key: one public, one private. People with your public key can 
     securely encrypt data that can only be read by someone with your 
@@ -99,12 +99,12 @@ If you've never used Git or GitHub before, start by installing Git and creating 
     click "Create RSA key...":
     
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/git-config-2.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/git-config-2.png", dpi = 220)
     ```
     
 1.  Give GitHub your SSH public key: <https://github.com/settings/ssh>.
-    The easiest way to find the key is to click "View public key" in the
-    Git/SVN preferences pane.
+    The easiest way to find the key is to click "View public key" in
+    RStudio's Git/SVN preferences pane.
 
 ## Create a local Git repository {#git-init}
 
@@ -116,7 +116,7 @@ To create a new repo:
     "Version control system" from "None" to "Git":
     
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/git-proj-config.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/git-proj-config.png", dpi = 220)
     ```
     
     You'll then be prompted to restart RStudio.
@@ -129,42 +129,42 @@ Once Git has been initialised, you'll see two new components:
     changed and includes buttons for the most important Git commands:
     
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/git-pane.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/git-pane.png", dpi = 220)
     ```
     
   * The __git dropdown__ menu, found in the toolbar, includes Git and GitHub commands
     that apply to the current file:
   
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/git-dropdown.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/git-dropdown.png", dpi = 220)
     ```
 
 ## See what's changed {#git-status}
 
 The first benefit of Git is that you can easily see the changes you've made. I find this really helpful, as I often accidentally mistype keyboard shortcuts, leaving stray characters in my code. The RStudio Git pane lists every file that's been added, modified or deleted. The icon describes the change:
 
-* `r bookdown::embed_png("screenshots/git-modified.png", dpi = 220)`, 
+* `r oldbookdown::screenshot("screenshots/git-modified.png", dpi = 220)`, 
   __Modified__. You've changed the contents of the file.
 
-* `r bookdown::embed_png("screenshots/git-unknown.png", dpi = 220)`, 
+* `r oldbookdown::screenshot("screenshots/git-unknown.png", dpi = 220)`, 
   __Untracked__. You've added a new file that Git hasn't seen before.
 
-* `r bookdown::embed_png("screenshots/git-deleted.png", dpi = 220)`, 
+* `r oldbookdown::screenshot("screenshots/git-deleted.png", dpi = 220)`, 
   __Deleted__. You've deleted a file.
 
-You can get more details about modifications with a "diff", `r bookdown::embed_png("screenshots/git-diff.png", dpi = 220)`. This opens a new window showing the detailed **diff**erences:
+You can get more details about modifications with a "diff", `r oldbookdown::screenshot("screenshots/git-diff.png", dpi = 220)`. This opens a new window showing the detailed **diff**erences:
 
 ```{r, echo = FALSE}
-bookdown::embed_png("screenshots/git-diff-window.png", dpi = 220)
+oldbookdown::screenshot("screenshots/git-diff-window.png", dpi = 220)
 ```
 
-The background colours tells you whether the text has been added (green) or removed (red). (If you're colourblind you can use the line numbers in the two columns at the far left as a guide: a number in the first column identifies the old version, a number in second column identifies the new version.) The grey lines of code above and below the changes are there to help you to locate where those changes appear in the context of the whole file. 
+The background colours tells you whether the text has been added (green) or removed (red). (If you're colourblind you can use the line numbers in the two columns at the far left as a guide: a number in the first column identifies the old version, a number in second column identifies the new version.) The grey lines of code above and below the changes give you additional context.
 
-In the shell, use `git status` to show an overview of changes and `git diff` to see detailed differences.  
+In the shell, use `git status` to see an overview of changes and `git diff` to show detailed differences.  
 
 ## Record changes {#git-commit}
 
-The fundamental unit of work in Git is a __commit__. A commit takes snapshot of your code at a specified point in time. If you make a mistake, you can rollback changes to a previous commit. Using a Git commit is like using an anchor when climbing. If you're crossing a dangerous rock face you want to make sure you've used protection to catch you if you fall. Commits play a similar role: if you make a mistake, you can't fall past the previous commit. Coding without commits is like free-climbing: you can travel much faster in the short-term, but in the long-term the chances of catastrophic failure are high! Like rock climbing protection, you want to be judicious in your use of commits. Committing too frequently will slow your progress; use more commits when you're in uncertain or dangerous territory. Commits are also helpful to others, because they show your journey, not just the destination.
+The fundamental unit of work in Git is a __commit__. A commit takes a snapshot of your code at a specified point in time. Using a Git commit is like using anchors and other protection when climbing. If you're crossing a dangerous rock face you want to make sure you've used protection to catch you if you fall. Commits play a similar role: if you make a mistake, you can't fall past the previous commit. Coding without commits is like free-climbing: you can travel much faster in the short-term, but in the long-term the chances of catastrophic failure are high! Like rock climbing protection, you want to be judicious in your use of commits. Committing too frequently will slow your progress; use more commits when you're in uncertain or dangerous territory. Commits are also helpful to others, because they show your journey, not just the destination.
 
 There are five key components to every commit:
 
@@ -187,15 +187,15 @@ You create a commit in two stages:
   
 1.  You __commit__ the staged files, describing the changes with a message.
 
-In RStudio, staging and committing are done in the commit window, which you can open by clicking `r bookdown::embed_png("screenshots/git-commit.png", dpi = 220)` or by pressing Ctrl + Alt + m.
+In RStudio, staging and committing are done in the same place, the commit window, which you can open by clicking `r oldbookdown::screenshot("screenshots/git-commit.png", dpi = 220)` or by pressing Ctrl + Alt + m.
 
 ```{r, echo = FALSE}
-bookdown::embed_png("screenshots/git-commit-window.png", dpi = 220)
+oldbookdown::screenshot("screenshots/git-commit-window.png", dpi = 220)
 ```
 
 The commit window is made up of three panes:
 
-* The top-left pane shows the current status, the same as the Git pane in the 
+* The top-left pane shows the current status in the way as the Git pane in the 
   main RStudio window.
 
 * The bottom pane shows the diff of the currently selected file.
@@ -204,34 +204,34 @@ The commit window is made up of three panes:
   readable message summarising the changes made in the commit. More on 
   that shortly.
 
-(Yes, this is exactly the same window you see when clicking `r bookdown::embed_png("screenshots/git-diff.png", dpi = 220)`!)
+(Yes, this is exactly the same window you see when clicking `r oldbookdown::screenshot("screenshots/git-diff.png", dpi = 220)`!)
 
 To create a new commit:
 
 1.  __Save your changes__.
 
 1.  __Open the commit window__ by clicking 
-    `r bookdown::embed_png("screenshots/git-commit.png", dpi = 220)` or 
+    `r oldbookdown::screenshot("screenshots/git-commit.png", dpi = 220)` or 
     pressing `Ctrl + Alt + m`.  
 
 1.  __Select files__.  To stage (select) a single file for inclusion, tick its
-    check box. To stage all files, press Cmd + A, then click 
-    `r bookdown::embed_png("screenshots/git-stage.png", dpi = 220)`. 
+    check box. To stage all files, press Ctrl/Cmd + A, then click 
+    `r oldbookdown::screenshot("screenshots/git-stage.png", dpi = 220)`. 
     
     As you stage each file, you'll notice that its status changes. The icon
     will change columns from right (unstaged status) to left (staged status),
     and you might see one of two new icons:
 
-      * Added: `r bookdown::embed_png("screenshots/git-added.png", dpi = 220)`: 
+      * Added: `r oldbookdown::screenshot("screenshots/git-added.png", dpi = 220)`: 
         after staging an untracked file, Git now knows that you want to add it 
         to the repo.
       
-      * Renamed: `r bookdown::embed_png("screenshots/git-renamed.png", dpi = 220)`:
+      * Renamed: `r oldbookdown::screenshot("screenshots/git-renamed.png", dpi = 220)`:
         If you rename a file, Git initially sees it as a deletion and addition.
         Once you stage both changes, Git will recognise that it's a rename.
         
     Sometimes you'll see a status in both columns, e.g. 
-    `r bookdown::embed_png("screenshots/git-modified-staged.png", dpi = 220)`.
+    `r oldbookdown::screenshot("screenshots/git-modified-staged.png", dpi = 220)`.
     This means that you have both staged and unstaged changes in the same file.
     This happens when you've made some changes, staged them, and then made some 
     more. Clicking the staged checkbox will stage your new changes, clicking
@@ -278,39 +278,39 @@ Each commit message should:
 If you do this:
 
 * It'll be easier to work with others. For example, if two people have changed 
-  the same file in the same place, it'll easier to resolve conflicts if the 
+  the same file in the same place, it'll be easier to resolve conflicts if the 
   commits are small and it's clear why each change was made.
   
 * Project newcomers can more easily understand the history by reading the commit 
   logs.
   
 * You can load and run your package at any point along its development history. 
-  This can be tremendously useful tools like
+  This can be tremendously useful with tools like
   [bisectr](https://github.com/wch/bisectr), which allow you to use binary
   search to quickly find the commit that introduced a bug.
 
 * If you can figure out exactly when a bug was introduced, you can easily 
   understand what you were doing (and why!).
 
-You might think that because no one else will ever look at your repo, that writing good commit messages is not worth the effort. However, you need to keep in mind that you have one very important collaborator: future-you! If you spend a little time now polishing your commit messages, future-you will thank you if and when future-you needs to do a post-mortem on a bug. 
+You might think that because no one else will ever look at your repo, that writing good commit messages is not worth the effort. But keep in mind that you have one very important collaborator: future-you! If you spend a little time now polishing your commit messages, future-you will thank you if and when they need to do a post-mortem on a bug. 
 
 Remember that these directives are aspirational. You shouldn't let them get in your way. If you look at the commit history of my repositories, you'll notice a lot of them aren't that good, especially when I start to get frustrated that I __still__ haven't managed to fix a bug. Strive to follow these guidelines, and remember it's better to have multiple bad commits than to have one perfect commit.
 
 ## Ignoring files {#git-ignore}
 
-Often, there are files that you don't want to include in the repository. They might be transient (like LaTex or C build artefacts), very large, or generated on demand. Rather than carefully _not_ staging them each time, you should instead add them to `.gitignore`. This will prevent them from ever being added. The easiest way to do this is to right-click on the file in the Git pane and select `Ignore`:
+Often, there are files that you don't want to include in the repository. They might be transient (like LaTeX or C build artefacts), very large, or generated on demand. Rather than carefully _not_ staging them each time, you should instead add them to `.gitignore`. This will prevent them from accidentally being added. The easiest way to do this is to right-click on the file in the Git pane and select `Ignore`:
 
 ```{r, echo = FALSE}
-bookdown::embed_png("screenshots/git-ignore.png", dpi = 220)
+oldbookdown::screenshot("screenshots/git-ignore.png", dpi = 220)
 ```
 
 If you want to ignore multiple files, you can use a wildcard "glob" like `*.png`. To learn more about the options, see [ignoring files](http://git-scm.com/book/ch2-2.html#Ignoring-Files) in Pro-Git.
 
-Some developers never commit derived files, files that can be generated automatically. For an R package this would mean ignoring the files in the `NAMESPACE` and `man/` directories because they're generated from comments. But from a practical pespective, it's better to commit these files: R packages have no way to generate `.Rd` files on installation so ignoring derived files means that users who install your package from GitHub will have no documentation.
+Some developers never commit derived files, files that can be generated automatically. For an R package this would mean ignoring the files in the `NAMESPACE` and `man/` directories because they're generated from comments. From a practical pespective, it's better to commit these files: R packages have no way to generate `.Rd` files on installation so ignoring derived files means that users who install your package from GitHub will have no documentation.
 
 ## Undo a mistake {#git-undo}
 
-The best thing about using commits is that you can undo mistakes. RStudio makes it easy to undo recent mistakes:
+The best thing about using commits is that you can undo mistakes. RStudio makes it particularly easy:
 
 *   To undo the changes you've just made, right click on the file in the Git 
     pane and select "revert". This will roll any changes back to the previous 
@@ -318,12 +318,12 @@ The best thing about using commits is that you can undo mistakes. RStudio makes 
   
     You can also undo changes to just part of a file in the diff window. Look 
     for a __discard chunk__ button above the block of changes that you want to 
-    undo:`r bookdown::embed_png("screenshots/git-chunk.png", dpi = 220)`. You 
+    undo:`r oldbookdown::screenshot("screenshots/git-chunk.png", dpi = 220)`. You 
     can also discard changes to individual lines or selected text.
 
 *   If you committed changes too early, you can modify the previous commit by 
     staging the extra changes. Before you click commit, select 
-    `r bookdown::embed_png("screenshots/git-commit-amend.png", dpi = 220)`. 
+    `r oldbookdown::screenshot("screenshots/git-commit-amend.png", dpi = 220)`. 
     (Don't do this if you've pushed the previous commit to GitHub - you're
     effectively rewriting history, which should be done with care when you're 
     doing it in public.)
@@ -331,11 +331,11 @@ The best thing about using commits is that you can undo mistakes. RStudio makes 
 If you didn't catch the mistake right away, you'll need to look backwards in history and find out where it occurred:
 
 1.  Open the history window by clicking
-    `r bookdown::embed_png("screenshots/git-history.png", dpi = 220)` in the 
+    `r oldbookdown::screenshot("screenshots/git-history.png", dpi = 220)` in the 
     Git pane.
     
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/git-history-window.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/git-history-window.png", dpi = 220)
     ```
 
     The history window is divided into two parts. The top part lists every
@@ -345,7 +345,7 @@ If you didn't catch the mistake right away, you'll need to look backwards in his
      
 1.  Navigate back in time until you find the commit where the mistake occurred.
     Write down the parent SHA: that's the commit that occurred before the 
-    mistake so it will be good
+    mistake so it will be good.
     
 Now you can use that SHA in the shell:
 
@@ -370,7 +370,7 @@ If you're still stuck, try <http://sethrobertson.github.io/GitFixUm/fixup.html> 
 
 ## Synchronising with GitHub {#github-init}
 
-So far we've only been working locally, using commits to track the progress of a project and to provide safe checkpoints. However, Git really shines when you start publishing your code to the public at large. We're going to use [GitHub](http://github.com) to do this. While there are other choices, I recommend GitHub because it is free for open source projects, it has all the features you'll need and it is popular choice in the R world. 
+So far we've only been working locally, using commits to track the progress of a project and to provide safe checkpoints. However, Git really shines when you start sharing your code with others with [GitHub](http://github.com). While there are other choices, I recommend GitHub because it is free for open source projects, it has all the features you'll need, and is a popular choice in the R world. 
 
 To publish, or __push__, your code to GitHub:
 
@@ -404,16 +404,16 @@ Now let's make a commit and verify that the remote repo updates:
     links to GitHub site").
     
 1.  __Push__ your changes to GitHub by clicking 
-    `r bookdown::embed_png("screenshots/git-push.png", dpi = 220)`. (This is 
+    `r oldbookdown::screenshot("screenshots/git-push.png", dpi = 220)`. (This is 
     the same as running `git push` in the shell). 
     
 1.  Go to your GitHub page and look at the `DESCRIPTION`.
 
 Usually, each push will include multiple commits. This is because you push much less often than you commit. How often you push versus commit is completely up to you, but pushing code means publishing code. So strive to push code that works. 
 
-To ensure your code is clean, I recommend always running `R CMD check` before you push (a topic you'll learn about in chapter on [automated checking](#check)). However, if you want to publish code that doesn't work (yet), I recommend using a branch, as you'll learn about below in [branching](#git-branch).
+To ensure your code is clean, I recommend always running `R CMD check` before you push (a topic you'll learn about in the chapter on [automated checking](#check)). If you want to publish code that doesn't work (yet), I recommend using a branch, as you'll learn about below in [branching](#git-branch).
 
-Once you've connected your repo to GitHub, the Git pane will show you how many commits you have locally that are not on GitHub: `r bookdown::embed_png("screenshots/git-local-commits.png", dpi = 220)`. This message indicates that I have 1 commit locally (my branch) that is not on GitHub ("origin/master").
+Once you've connected your repo to GitHub, the Git pane will show you how many commits you have locally that are not on GitHub: `r oldbookdown::screenshot("screenshots/git-local-commits.png", dpi = 220)`. This message indicates that I have 1 commit locally (my branch) that is not on GitHub ("origin/master").
 
 ## Benefits of using GitHub {#github-benefit}
 
@@ -433,7 +433,7 @@ Once you've connected your repo to GitHub, the Git pane will show you how many c
     ``` 
 
 1.  You can track the history of the project in the commit view, e.g. 
-    <https://github.com/hadley/testthat/commits/master>. When I'm working on a 
+    <https://github.com/hadley/testthat/commits/master>. When I'm working on 
     a package with others, I often keep this page open so I can see what 
     they're working on.  Individual commits show the same information that you 
     see in the commit/diff window in RStudio.
@@ -442,33 +442,35 @@ Once you've connected your repo to GitHub, the Git pane will show you how many c
     __History__, you'll see every commit that affected that file. Another useful 
     view is __Blame__; it shows the last change made to each line of code, who 
     made the change, and the commit the change belongs to. This is tremendously 
-    helpful when you're tracking down a bug. You can jump directly to these pages 
-    from RStudio with the Git dropdown in the main toolbar: 
+    helpful when you're tracking down a bug. 
+    
+    You can jump directly to these pages from RStudio with the Git dropdown in 
+    the main toolbar: 
     
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/git-dropdown.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/git-dropdown.png", dpi = 220)
     ```
 
 1.  You can comment on commits. To comment on the commit as a whole, use the 
     comment box at the bottom of the page. To comment on an individual line,
     click the plus sign that appears when you mouse over a line number,
-    `r bookdown::embed_png("screenshots/github-comment-line.png", dpi = 220)`. 
+    `r oldbookdown::screenshot("screenshots/github-comment-line.png", dpi = 220)`. 
     This is a great way to let your collaborators know if you see a mistake or 
     have a question. It's better than email because it's public so anyone 
     working on the repo (both present and future) can see the conversation.
 
 ## Working with others {#git-pull}
 
-You use __push__ to send your changes to GitHub. If you're working with others, they also push their changes to GitHub. But, to see their changes locally you'll need to __pull__ their changes from GitHub. In fact, to make sure everyone is in sync Git will only let you push to a repo if you've retrieved the most recent version with a pull.
+You use __push__ to send your changes to GitHub. If you're working with others, they also push their changes to GitHub. But, to see their changes locally you'll need to __pull__ their changes from GitHub. In fact, to make sure everyone is in sync, Git will only let you push to a repo if you've retrieved the most recent version with a pull.
 
-When you pull, Git first downloads (__fetches__) all of the changes and then __merges__ them with the changes that you've made. A merge is a commit with two parents. It takes two different lines of development and combines them into a single result. In many cases, Git can do this automatically: for example, when changes are made to different files, or to different parts of the same file. However, if changes are made to the same place in a file (this is called a __merge conflict__), you'll need to resolve the conflict yourself.
+When you pull, Git first downloads (__fetches__) all of the changes and then __merges__ them with the changes that you've made. A merge is a commit with two parents. It takes two different lines of development and combines them into a single result. In many cases, Git can do this automatically: for example, when changes are made to different files, or to different parts of the same file. However, if changes are made to the same place in a file, you'll need to resolve the __merge conflict__ yourself.
 
 In RStudio, you'll discover that you have merge conflict when:
 
 * A pull fails with an error.
 
 * In the Git pane, you see a status like
-  `r bookdown::embed_png("screenshots/git-commit-conflict.png", dpi = 220)`
+  `r oldbookdown::screenshot("screenshots/git-commit-conflict.png", dpi = 220)`
 
 RStudio currently doesn't provide any tools to help with merge conflicts, so you'll need to use the command line. I recommend starting by setting your merge conflict "style" to `diff3`. The `diff3` style shows three things when you get a merge conflict: your local changes, the original file and the remote changes. The default style is `diff2`, which only shows your changes and the remote changes. This generally makes it harder to figure out what's happened. 
 
@@ -489,7 +491,7 @@ RStudio currently doesn't provide any tools to help with merge conflicts, so you
     git config --global merge.conflictstyle diff3
     ```
 
-To resolve a merge conflict, you need to open every file with the status `r bookdown::embed_png("screenshots/git-commit-conflict.png", dpi = 220)`. In each file, you'll find a conflict marker that looks like this:
+To resolve a merge conflict, you need to open every file with the status `r oldbookdown::screenshot("screenshots/git-commit-conflict.png", dpi = 220)`. In each file, you'll find a conflict marker that looks like this:
 
 ```
 <<<<<<< HEAD
@@ -509,7 +511,7 @@ This shows all three versions of the conflicting code:
   two lines of development (This is missing in the default conflict 
   style, so if you don't see it, follow the instructions above).
 
-* At the bottom, the remote code that you pulled down from Github.
+* At the bottom, the remote code that you pulled down from GitHub.
 
 You need to work through each conflict and decide either which version is better, or how to combine both versions. Then, before you stage the file, make sure you've deleted all the conflict markers. Once you've fixed all conflicts, make a new commit and push to GitHub.
 
@@ -518,7 +520,7 @@ A couple of pointers when fixing text generated by roxygen:
 * Don't fix problems in `man/*.Rd` files. Instead, resolve any conflicts in 
   the underlying roxygen comments and re-document the package.
    
-* Merging conflicts in the `NAMESPACE` file will prevent you from re-loading or 
+* Merge conflicts in the `NAMESPACE` file will prevent you from re-loading or 
   re-documenting a package. Resolve them enough so that the package 
   can be loaded, then re-document to generate a clean and correct `NAMESPACE`.
 
@@ -528,7 +530,7 @@ Handling merge conflicts is one of the trickier parts of Git. You may need to re
 
 Every GitHub repo comes with a page for tracking issues. Use it! If you encounter a bug while working on another project, jot a note down on the issues page. When you have a smaller project, don't worry too much about milestones, tags and assigning issues to specific people. Those are more useful once you get over a page of issues (>50). Once you get to that point, read the GitHub guide on issues: <https://guides.github.com/features/issues/>.
 
-A useful technique is closing issues from a commit message. Just put `Closes #<issue number>` somewhere in your commit message and GitHub will close the issue for you when you next push. The best thing about closing issues this way is that it makes a link from the issue to the commit. This is useful if you ever have to come back to the bug and want see exactly what you did to fix it. You can also link to issues without closing them; just refer to `#<issue number>`.
+A useful technique is closing issues from a commit message. Just put `Closes #<issue number>` somewhere in your commit message and GitHub will close the issue for you when you next push. The best thing about closing issues this way is that it makes a link from the issue to the commit. This is useful if you ever have to come back to the bug and want to see exactly what you did to fix it. You can also link to issues without closing them; just refer to `#<issue number>`.
 
 As you'll learn about in [NEWS.md](#news), it's a good idea to add a bullet to `NEWS.md` whenever you close an issue. The bullet point should describe the issue in terms that users will understand, as opposed to the commit message which is written for developers.
 
@@ -536,24 +538,24 @@ As you'll learn about in [NEWS.md](#news), it's a good idea to add a bullet to `
 
 Sometimes you want to make big changes to your code without having to disturb your main stream of development. Maybe you want to break it up into multiple simple commits so you can easily track what you're doing. Maybe you're not sure what you've done is the best approach and you want someone else to review your code. Or, maybe you want to try something experimental (you can merge it back only if the experiment succeeds). Branches and pull requests provide powerful tools to handle these situations.
 
-Although you haven't realised it, you're already using branches. The default branch is called __master__; it's where you've been saving your commits. However, if you synchronise your code to GitHub you'll also have a branch called __origin/master__: it's a local copy of all the commits on GitHub, which gets synchronised when you pull. `git pull` does two things:
+Although you haven't realised it, you're already using branches. The default branch is called __master__; it's where you've been saving your commits. If you synchronise your code to GitHub you'll also have a branch called __origin/master__: it's a local copy of all the commits on GitHub, which gets synchronised when you pull. `git pull` does two things:
 
-1.  `git fetch origin master` updates the local `origin/master` branch with
+1.  `git fetch origin master` to update the local `origin/master` branch with
     the latest commits from GitHub.
   
-1.  `git merge orgin/master` combines the remote changes with your changes.
+1.  `git merge origin/master` to combine the remote changes with your changes.
 
-It's useful to create your own new branches when you want to (temporarily) break away from the main stream of development. You can create a new branch with `git checkout -b <branch-name>`. Names should be in lower case letters and numbers, with `-` used to separate words. 
+It's useful to create your own branches when you want to (temporarily) break away from the main stream of development. You can create a new branch with `git checkout -b <branch-name>`. Names should be in lower case letters and numbers, with `-` used to separate words. 
   
-Switch between branches with `git checkout <branch-name>`. For example, to return to the main line of development use `git branch master`. You can also use the branch switcher at the top right of the Git pane:
+Switch between branches with `git checkout <branch-name>`. For example, to return to the main line of development use `git checkout master`. You can also use the branch switcher at the top right of the Git pane:
   
 ```{r, echo = FALSE}
-bookdown::embed_png("screenshots/git-branch.png", dpi = 220)
+oldbookdown::screenshot("screenshots/git-branch.png", dpi = 220)
 ```
 
 If you've forgotten the name of your branch in the shell, you can use `git branch` to list all existing branches. 
 
-If you try to synchronise this branch to GitHub from inside RStudio, you'll notice that push and pull are disabled: `r bookdown::embed_png("screenshots/git-no-remote.png", dpi = 220)`. To enable them, you'll need to first tell Git that your local branch has a remote equivalent:
+If you try to synchronise this branch to GitHub from inside RStudio, you'll notice that push and pull are disabled: `r oldbookdown::screenshot("screenshots/git-no-remote.png", dpi = 220)`. To enable them, you'll need to first tell Git that your local branch has a remote equivalent:
 
 ```bash
 git push --set-upstream origin <branch-name>
@@ -577,7 +579,7 @@ git branch -d <branch-name>
 
 A pull request is a tool for proposing and discussing changes before merging them into a repo. The most common use for a pull request is to contribute to someone else's code: it's the easiest way to propose changes to code that you don't control. 
 
-Below, you'll learn about pull requests in the context of your own code. This may seem a bit pointless because you don't _need_ them, as you can directly modify your code. But pull requests are surprisingly useful because they allow you to get feedback on a proposed changes. In fact, we use them frequently at RStudio to get feedback before merging major changes.
+Below, you'll learn about pull requests to make changes to your own code. This may seem a bit pointless because you don't _need_ them, as you can directly modify your code. But pull requests are surprisingly useful because they allow you to get feedback on proposed changes. We use them frequently at RStudio to get feedback before merging major changes.
 
 GitHub has some good documentation on using pull requests: <https://help.github.com/articles/using-pull-requests/>. In this chapter, I'll focus on the basics you need to know to use pull requests effectively, and show you how they fit in with the Git commands you've learned so far.
 
@@ -586,15 +588,15 @@ To create a pull request, you create a branch, commit code, then push the branch
 1.  Switching branches: 
 
     ```{r, echo = FALSE}
-    bookdown::embed_png("screenshots/github-branches.png", dpi = 220)
+    oldbookdown::screenshot("screenshots/github-branches.png", dpi = 220)
     ```
 
-1.  Clicking `r bookdown::embed_png("screenshots/pr-create.png", dpi = 220)`
+1.  Clicking `r oldbookdown::screenshot("screenshots/pr-create.png", dpi = 220)`
 
 This will create a page that looks like this:
 
 ```{r, echo = FALSE}
-bookdown::embed_png("screenshots/pr.png", dpi = 220)
+oldbookdown::screenshot("screenshots/pr.png", dpi = 220)
 ```
 
 This pull request, which fixes a couple of small problems, is one that was submitted to this book's GitHub site.
@@ -602,26 +604,26 @@ This pull request, which fixes a couple of small problems, is one that was submi
 There are three parts to a pull request:
 
 * A __conversation__, 
-  `r bookdown::embed_png("screenshots/pr-conversation.png", dpi = 220)`,
+  `r oldbookdown::screenshot("screenshots/pr-conversation.png", dpi = 220)`,
   where you can discuss the changes as a whole.
   
 * The __commits__ view, 
-  `r bookdown::embed_png("screenshots/pr-commits.png", dpi = 220)`,
+  `r oldbookdown::screenshot("screenshots/pr-commits.png", dpi = 220)`,
   where you can see each individual commit.
   
 * The __file changes__,
-  `r bookdown::embed_png("screenshots/pr-changes.png", dpi = 220)`,
+  `r oldbookdown::screenshot("screenshots/pr-changes.png", dpi = 220)`,
   where you see the overall diff of the commits, and you can comment
   on individual lines.
 
-Once you're done discussing a pull request, you either choose to merge it or delete it. Merging it is equivalent to running `git merge <branchname>` from the shell; deleting is equivalent to `git branch -r <branchname>`.
+Once you're done discussing a pull request, you either choose to merge it or delete it. Merging it is equivalent to running `git merge <branchname>` from the shell; deleting is equivalent to `git branch -d <branchname>`.
 
 ## Submitting a pull request to another repo {#pr-make}
 
 To submit a pull request to a repo that you don't own, you first need to create a copy of the repo that you can own, called a __fork__, and then clone that fork on your own computer:
 
 1.  __Fork__ the original repo by going to the repo on GitHub and clicking
-    `r bookdown::embed_png("screenshots/github-fork.png", dpi = 220)`. 
+    `r oldbookdown::screenshot("screenshots/github-fork.png", dpi = 220)`. 
     This creates a copy of the repo that belongs to you. 
 
 1.  __Clone__ the forked repo to create a local copy of the remote repo. 
@@ -636,7 +638,7 @@ To submit a pull request to a repo that you don't own, you first need to create 
 A fork is a _static_ copy of the repo: once you've created it, GitHub does nothing to keep it in sync with the upstream repo. This is a problem because while you're working on a pull request, changes might occur in the original repo. To keep the forked and the original repo in sync, start by telling your repo about the upstream repo:
 
 ```bash
-git remote add upstream git@github.com:<original-name>/extrafont.git
+git remote add upstream git@github.com:<original-name>/<repo>.git
 git fetch upstream
 ```
 
@@ -673,7 +675,7 @@ A pull request (PR) is a one-to-one mapping to a branch, so you can also use thi
 The diagram below illustrates the main steps of creating a pull request and updating the request as the upstream repo changes:
 
 ```{r, echo = FALSE}
-bookdown::embed_png("diagrams/pull-request-process.png", dpi = 220)    
+oldbookdown::screenshot("diagrams/pull-request-process.png", dpi = 220)    
 ```
 
 ## Reviewing and accepting pull requests {#pr-accept}
